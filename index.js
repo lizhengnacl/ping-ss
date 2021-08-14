@@ -2,6 +2,10 @@
  * https://portal.shadowsocks.nz/clientarea.php?action=productdetails&id=1087298
  * 服务器列表页控制台执行，获取服务器列表
  * copy([].slice.apply(document.querySelectorAll('.table.table-hover.bordered-table.zebra-striped tr td:nth-child(2) code')).map(_=>_.innerHTML))
+ *
+ * 判断服务归属地：
+ * 1. 找到IP：dig archive.org
+ * 2. 查找IP 归属地：https://www.ip138.com/
  */
 
 let ping = require('ping');
@@ -84,7 +88,11 @@ let arr = [
   'v6-3.sstr-api.xyz',
 ];
 
-let japan = ['ty', 'os', 'v6'];
+let whiteList = ['ty', 'os', 'v6', 'fm'];
+
+function isEmpty(list) {
+  return list.length === 0;
+}
 
 function belongTo(host, countryTags) {
   let yes = false;
@@ -99,7 +107,7 @@ function belongTo(host, countryTags) {
 let s = Date.now();
 arr.forEach(function(host) {
   ping.sys.probe(host, function(isAlive) {
-    if (belongTo(host, japan)) {
+    if (isEmpty(whiteList) || belongTo(host, whiteList)) {
       let msg = isAlive ?
           'host ' + host + ` is alive. timeout: ${Date.now() - s}` :
           'host ' + host + ' is dead';
